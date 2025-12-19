@@ -1,0 +1,90 @@
+
+{% extends 'predictor/base.html' %}
+{% block content %}
+<div class="fade-in">
+    <div class="text-center mb-4">
+        <h2 class="mb-2">✅ Task Management</h2>
+        <p class="text-muted">Organize your daily tasks and reduce stress</p>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h5 class="mb-3">➕ Add New Task</h5>
+                    <form method="post" action="{% url 'task_add' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Task Title</label>
+                            {{ form.title }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Due Date (Optional)</label>
+                            {{ form.due_date }}
+                        </div>
+                        <div class="d-grid">
+                            <button class="btn btn-primary" type="submit">
+                                ➕ Add Task
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h5 class="mb-3">📋 Your Tasks</h5>
+                    <div class="list-group">
+                        {% for t in tasks %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1" {% if t.completed %}style="text-decoration:line-through; opacity: 0.6;"{% endif %}>
+                                        {% if t.completed %}✓{% else %}○{% endif %} {{ t.title }}
+                                    </h6>
+                                    {% if t.due_date %}
+                                    <small class="text-muted">
+                                        📅 Due: {{ t.due_date|date:"M d, Y" }}
+                                    </small>
+                                    {% endif %}
+                                </div>
+                                <div class="btn-group">
+                                    <a class="btn btn-sm {% if t.completed %}btn-outline-secondary{% else %}btn-success{% endif %}" 
+                                       href="{% url 'task_toggle' t.pk %}">
+                                        {% if t.completed %}↩️ Undo{% else %}✓ Done{% endif %}
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-danger" href="{% url 'task_delete' t.pk %}">
+                                        🗑️ Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-center p-5">
+                            <div style="font-size: 3rem; margin-bottom: 20px;">📝</div>
+                            <h5 class="mb-3">No Tasks Yet</h5>
+                            <p class="text-muted">Add your first task to get started!</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #id_title {
+        border-radius: 10px;
+        border: 2px solid #e0e7ff;
+        padding: 12px;
+    }
+    #id_due_date {
+        border-radius: 10px;
+        border: 2px solid #e0e7ff;
+        padding: 12px;
+    }
+</style>
+{% endblock %}

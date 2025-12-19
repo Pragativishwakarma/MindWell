@@ -1,0 +1,424 @@
+{% extends 'predictor/base.html' %}
+{% block content %}
+<div class="fade-in">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="mb-2">📊 Wellness Dashboard</h2>
+            <p class="text-muted">Welcome back, <strong>{{ user.username }}</strong>! Here's your mental health overview</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="card-body p-3">
+                    <div id="currentDateTime" style="font-size: 0.9rem;">
+                        <div id="currentDate" class="fw-bold">📅 Loading...</div>
+                        <div id="currentTime">🕐 Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                weekday: 'short'
+            };
+            const dateStr = now.toLocaleDateString('en-US', options);
+            const timeStr = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+            });
+            
+            document.getElementById('currentDate').textContent = '📅 ' + dateStr;
+            document.getElementById('currentTime').textContent = '🕐 ' + timeStr;
+        }
+        
+        // Update immediately and then every second
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script>
+
+    <!-- Quick Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center" style="background: linear-gradient(135deg, #667eea 0%,rgb(187, 150, 223) 100%); color: white;">
+                <div class="card-body">
+                    <div style="font-size: 2.5rem;">🤖</div>
+                    <h3 class="mb-0">{{ ml_predictions|length }}</h3>
+                    <small>ML Predictions</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center" style="background: linear-gradient(135deg,rgb(217, 155, 224) 0%,rgb(224, 111, 170) 100%); color: white;">
+                <div class="card-body">
+                    <div style="font-size: 2.5rem;">😊</div>
+                    <h3 class="mb-0">{{ moods|length }}</h3>
+                    <small>Mood Entries</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center" style="background: linear-gradient(135deg,rgb(140, 190, 234) 0%,rgb(157, 139, 211) 100%); color: white;">
+                <div class="card-body">
+                    <div style="font-size: 2.5rem;">📝</div>
+                    <h3 class="mb-0">{{ responses|length }}</h3>
+                    <small>Assessments</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center" style="background: linear-gradient(135deg,rgb(109, 117, 203) 0%, #38f9d7 100%); color: white;">
+                <div class="card-body">
+                    <div style="font-size: 2.5rem;">
+                        {% if model_loaded %}✅{% else %}⚠️{% endif %}
+                    </div>   
+                    <h6 class="mb-0">ML Model</h6>
+                    <small>{% if model_loaded %}Ready{% else %}Not Loaded{% endif %}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ML Model Status & Quick Actions -->
+    <div class="card mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="mb-2">🤖 AI-Powered Stress Detection</h5>
+                    {% if model_loaded %}
+                        <p class="mb-0">
+                            <span class="badge bg-success me-2">✅ Active</span>
+                            Random Forest model ready with 95% accuracy
+                        </p>
+                    {% else %}
+                        <p class="mb-0">
+                            <span class="badge bg-warning me-2">⚠️ Inactive</span>
+                            Train the model to enable ML predictions
+                        </p>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{% url 'ml_predict' %}" class="btn btn-light btn-lg">
+                        🔮 New Prediction
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="row">
+        <!-- Left Column: Chart -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">📈 Stress Trend Analysis</h5>
+                        <span class="badge bg-primary">Last 30 Days</span>
+                    </div>
+                    {% if responses %}
+                    <canvas id="stressChart" height="120"></canvas>
+                    <script>
+                        const labels = {{ chart_labels|safe }};
+                        const data = {{ chart_data|safe }};
+                        const ctx = document.getElementById('stressChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Stress Level',
+                                    data: data,
+                                    tension: 0.4,
+                                    fill: true,
+                                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                    borderColor: 'rgba(102, 126, 234, 1)',
+                                    borderWidth: 3,
+                                    pointRadius: 6,
+                                    pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                                    pointBorderColor: '#fff',
+                                    pointBorderWidth: 2,
+                                    pointHoverRadius: 8
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: true,
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top',
+                                        labels: {
+                                            font: { size: 14, weight: 'bold' }
+                                        }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        padding: 12,
+                                        titleFont: { size: 14 },
+                                        bodyFont: { size: 13 }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        max: 3,
+                                        ticks: {
+                                            stepSize: 1,
+                                            callback: function(value) {
+                                                return value === 1 ? 'Low' : value === 2 ? 'Medium' : value === 3 ? 'High' : '';
+                                            },
+                                            font: { size: 12, weight: 'bold' }
+                                        },
+                                        grid: {
+                                            color: 'rgba(0,0,0,0.05)'
+                                        }
+                                    },
+                                    x: {
+                                        grid: {
+                                            display: false
+                                        },
+                                        ticks: {
+                                            font: { size: 11 }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    </script>
+                    {% else %}
+                    <div class="text-center p-5">
+                        <div style="font-size: 4rem; opacity: 0.3;">📊</div>
+                        <p class="text-muted">No data yet. Take an assessment to see your trend!</p>
+                        <a href="{% url 'questionnaire' %}" class="btn btn-primary">Take Assessment</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Mood Entries -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">😊 Recent Moods</h5>
+                        <a href="{% url 'mood_add' %}" class="btn btn-sm btn-primary">+ Add</a>
+                    </div>
+                    <div style="max-height: 350px; overflow-y: auto;">
+                        {% for m in moods|slice:":5" %}
+                        <div class="card mb-2" style="border-left: 4px solid 
+                            {% if m.mood_scale >= 8 %}#28a745
+                            {% elif m.mood_scale >= 5 %}#ffc107
+                            {% else %}#dc3545{% endif %};">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div>
+                                        <small class="text-muted d-block">📅 {{ m.created_at|date:"M d, Y" }}</small>
+                                        <small class="text-muted">🕐 {{ m.created_at|date:"h:i A" }}</small>
+                                    </div>
+                                    <span class="badge" style="background: 
+                                        {% if m.mood_scale >= 8 %}#28a745
+                                        {% elif m.mood_scale >= 5 %}#ffc107
+                                        {% else %}#dc3545{% endif %};">
+                                        {{ m.mood_scale }}/10
+                                    </span>
+                                </div>
+                                {% if m.note %}
+                                <small class="text-muted">{{ m.note|truncatewords:8 }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center p-4">
+                            <div style="font-size: 3rem; opacity: 0.3;">😊</div>
+                            <p class="text-muted small">No mood entries yet</p>
+                            <a href="{% url 'mood_add' %}" class="btn btn-sm btn-primary">Add First Entry</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ML Predictions Section -->
+    <div class="card mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">🤖 ML Stress Predictions</h5>
+                <a href="{% url 'ml_predict' %}" class="btn btn-sm btn-success">+ New Prediction</a>
+            </div>
+            
+            {% if ml_predictions %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Prediction</th>
+                            <th>Confidence Scores</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pred in ml_predictions|slice:":5" %}
+                        <tr>
+                            <td>
+                                <strong>📅 {{ pred.created_at|date:"M d, Y" }}</strong><br>
+                                <small class="text-muted">🕐 {{ pred.created_at|date:"h:i:s A" }}</small>
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if pred.predicted_level == 'Stressed' %}bg-danger
+                                    {% elif pred.predicted_level == 'Neutral' %}bg-warning
+                                    {% elif pred.predicted_level == 'Amused' %}bg-success
+                                    {% else %}bg-secondary{% endif %}" 
+                                    style="font-size: 0.9rem; padding: 8px 15px;">
+                                    {{ pred.predicted_level }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if pred.confidence_stressed %}
+                                <div class="d-flex gap-1">
+                                    <span class="badge bg-success" style="font-size: 0.75rem;">
+                                        😊 {{ pred.confidence_amused|floatformat:0 }}%
+                                    </span>
+                                    <span class="badge bg-warning" style="font-size: 0.75rem;">
+                                        😐 {{ pred.confidence_neutral|floatformat:0 }}%
+                                    </span>
+                                    <span class="badge bg-danger" style="font-size: 0.75rem;">
+                                        ⚠️ {{ pred.confidence_stressed|floatformat:0 }}%
+                                    </span>
+                                </div>
+                                {% else %}
+                                <small class="text-muted">N/A</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if pred.predicted_level == 'Stressed' %}
+                                    <span class="text-danger">⚠️ High Alert</span>
+                                {% elif pred.predicted_level == 'Neutral' %}
+                                    <span class="text-warning">⚡ Moderate</span>
+                                {% else %}
+                                    <span class="text-success">✓ Good</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center p-5">
+                <div style="font-size: 4rem; opacity: 0.3;">🤖</div>
+                <h5 class="mb-3">No ML Predictions Yet</h5>
+                <p class="text-muted mb-4">Use our AI-powered model to get accurate stress predictions based on physiological data</p>
+                <a href="{% url 'ml_predict' %}" class="btn btn-primary btn-lg">🔮 Create First Prediction</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Questionnaire Responses Section -->
+    <div class="card mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">📋 Questionnaire Assessments</h5>
+                <a href="{% url 'questionnaire' %}" class="btn btn-sm btn-info">+ New Assessment</a>
+            </div>
+            
+            {% if responses %}
+            <div class="row">
+                {% for r in responses|slice:":6" %}
+                <div class="col-md-4 mb-3">
+                    <div class="card" style="border-left: 4px solid 
+                        {% if 'High' in r.predicted_level %}#dc3545
+                        {% elif 'Medium' in r.predicted_level %}#ffc107
+                        {% else %}#28a745{% endif %};">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <small class="text-muted d-block">📅 {{ r.created_at|date:"M d, Y" }}</small>
+                                    <small class="text-muted">🕐 {{ r.created_at|date:"h:i:s A" }}</small>
+                                </div>
+                                <span class="badge 
+                                    {% if 'High' in r.predicted_level %}bg-danger
+                                    {% elif 'Medium' in r.predicted_level %}bg-warning
+                                    {% else %}bg-success{% endif %}">
+                                    {{ r.predicted_level }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center p-5">
+                <div style="font-size: 4rem; opacity: 0.3;">📋</div>
+                <h5 class="mb-3">No Assessments Yet</h5>
+                <p class="text-muted mb-4">Take a quick 10-question assessment to evaluate your stress level</p>
+                <a href="{% url 'questionnaire' %}" class="btn btn-info btn-lg">📝 Take Assessment</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'ml_predict' %}" class="card text-decoration-none" style="border: 2px solid #667eea;">
+                <div class="card-body text-center p-4">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">🤖</div>
+                    <h6 class="mb-0">ML Prediction</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'questionnaire' %}" class="card text-decoration-none" style="border: 2px solid #4facfe;">
+                <div class="card-body text-center p-4">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">📋</div>
+                    <h6 class="mb-0">Assessment</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'tasks' %}" class="card text-decoration-none" style="border: 2px solid #43e97b;">
+                <div class="card-body text-center p-4">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
+                    <h6 class="mb-0">Tasks</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'journal' %}" class="card text-decoration-none" style="border: 2px solid #f093fb;">
+                <div class="card-body text-center p-4">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">📝</div>
+                    <h6 class="mb-0">Journal</h6>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+    }
+    .table-hover tbody tr:hover {
+        background: #f8f9fa;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

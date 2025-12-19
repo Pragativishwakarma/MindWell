@@ -1,0 +1,69 @@
+
+{% extends 'predictor/base.html' %}
+{% block content %}
+<div class="fade-in">
+    <div class="text-center mb-4">
+        <h2 class="mb-2">📝 Journal Entries</h2>
+        <p class="text-muted">Share your thoughts and feelings</p>
+    </div>
+    
+    <div class="text-center mb-4">
+        <a class="btn btn-primary btn-lg" href="{% url 'journal_add' %}">
+            ✍️ Write New Entry
+        </a>
+    </div>
+    
+    <div class="row">
+        {% for e in entries %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            {% if e.anonymous %}
+                                <h6 class="mb-1">
+                                    <span class="badge bg-secondary">🕶️ Anonymous</span>
+                                </h6>
+                            {% else %}
+                                <h6 class="mb-1">
+                                    <span class="badge bg-primary">👤 {{ e.user.username }}</span>
+                                </h6>
+                            {% endif %}
+                            <small class="text-muted d-block">📅 {{ e.created_at|date:'M d, Y' }}</small>
+                            <small class="text-muted">🕐 {{ e.created_at|date:'h:i:s A' }}</small>
+                        </div>
+                    </div>
+                    <div class="journal-content">
+                        {{ e.content|linebreaks }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card text-center">
+                <div class="card-body p-5">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">📖</div>
+                    <h4 class="mb-3">No Journal Entries Yet</h4>
+                    <p class="text-muted mb-4">Start your wellness journey by writing your first entry</p>
+                    <a href="{% url 'journal_add' %}" class="btn btn-primary btn-lg">
+                        ✍️ Write Your First Entry
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .journal-content {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #333;
+    }
+    .journal-content p {
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}

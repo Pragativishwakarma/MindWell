@@ -1,0 +1,78 @@
+
+{% extends 'predictor/base.html' %}
+{% block content %}
+<div class="fade-in">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="mb-2">✍️ Write Journal Entry</h2>
+                        <p class="text-muted">Express your thoughts and feelings</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                {{ form.anonymous }}
+                                <label class="form-check-label" for="{{ form.anonymous.id_for_label }}">
+                                    <strong>🕶️ Post Anonymously</strong>
+                                    <br><small class="text-muted">Your identity will be hidden from other users</small>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Your Thoughts</label>
+                            {{ form.content }}
+                            <small class="text-muted">Share what's on your mind. This is a safe space.</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-lg" type="submit">
+                                💾 Save Entry
+                            </button>
+                            <a href="{% url 'journal' %}" class="btn btn-outline-secondary">
+                                ← Back to Journal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3">💡 Journaling Tips</h6>
+                    <ul class="mb-0">
+                        <li>Write freely without judgment</li>
+                        <li>Focus on your feelings and emotions</li>
+                        <li>Be honest with yourself</li>
+                        <li>Use this as a tool for self-reflection</li>
+                        <li>Regular journaling can reduce stress and anxiety</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #id_content {
+        min-height: 200px;
+        border-radius: 10px;
+        border: 2px solid #e0e7ff;
+        padding: 15px;
+        font-size: 1rem;
+    }
+    #id_content:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+</style>
+{% endblock %}

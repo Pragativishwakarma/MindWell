@@ -1,0 +1,74 @@
+
+{% extends 'predictor/base.html' %}
+{% block content %}
+<div class="fade-in">
+    <div class="text-center mb-4">
+        <h2 class="mb-2">📚 Wellness Resources</h2>
+        <p class="text-muted">Helpful resources for managing stress and improving mental health</p>
+    </div>
+    
+    <div class="row">
+        {% for item in resources %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body p-4 text-center">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">
+                        {% if 'breathing' in item.title.lower %}🧘
+                        {% elif 'article' in item.title.lower %}📖
+                        {% elif 'helpline' in item.title.lower %}📞
+                        {% else %}💡{% endif %}
+                    </div>
+                    <h5 class="mb-3">{{ item.title }}</h5>
+                    <a href="{{ item.url }}" target="_blank" class="btn btn-primary w-100">
+                        Access Resource →
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6 mb-4">
+            <div class="card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;">
+                <div class="card-body p-4">
+                    <h5 class="mb-3">🧘 Quick Relaxation Tips</h5>
+                    <ul class="mb-0">
+                        <li>Take 5 deep breaths</li>
+                        <li>Practice progressive muscle relaxation</li>
+                        <li>Go for a short walk</li>
+                        <li>Listen to calming music</li>
+                        <li>Practice mindfulness meditation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="card-body p-4">
+                    <h5 class="mb-3">💪 Long-term Strategies</h5>
+                    <ul class="mb-0">
+                        <li>Maintain regular sleep schedule</li>
+                        <li>Exercise 30 minutes daily</li>
+                        <li>Practice gratitude journaling</li>
+                        <li>Connect with friends and family</li>
+                        <li>Seek professional help when needed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mt-4" style="border: 3px solid #dc3545;">
+        <div class="card-body p-4 text-center">
+            <h5 class="text-danger mb-3">🚨 Emergency Support</h5>
+            <p class="mb-3">If you're experiencing a mental health crisis, please reach out immediately:</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <a href="tel:988" class="btn btn-danger btn-lg">📞 Call 988 (Suicide & Crisis Lifeline)</a>
+                <a href="sms:741741" class="btn btn-outline-danger btn-lg">💬 Text HOME to 741741 (Crisis Text Line)</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

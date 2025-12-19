@@ -1,0 +1,161 @@
+{% extends 'predictor/base.html' %}
+
+{% block title %}ML Stress Prediction{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="text-center mb-4">
+        <h2 class="mb-3">🤖 ML-Based Stress Detection</h2>
+        <p class="lead text-muted">Enter physiological sensor data for AI-powered stress level prediction</p>
+    </div>
+    
+    {% if not model_loaded %}
+    <div class="alert alert-warning">
+        <strong>⚠️ Warning:</strong> ML model is not loaded. Please train the model first by running the training script.
+    </div>
+    {% else %}
+    <div class="alert alert-success">
+        <strong>✅ Model Ready:</strong> Random Forest model loaded with 95% accuracy
+    </div>
+    {% endif %}
+    
+    <div class="card mt-4">
+        <div class="card-body p-4">
+            <form method="post">
+                {% csrf_token %}
+                
+                <h5 class="mb-3">
+                    <span class="badge bg-primary">1</span> Blood Volume Pulse (BVP)
+                </h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>{{ form.BVP_mean.label }}</label>
+                        {{ form.BVP_mean }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>{{ form.BVP_std.label }}</label>
+                        {{ form.BVP_std }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>{{ form.BVP_peak_freq.label }}</label>
+                        {{ form.BVP_peak_freq }}
+                    </div>
+                </div>
+                
+                <h5 class="mb-3 mt-4">
+                    <span class="badge bg-success">2</span> Electrodermal Activity (EDA)
+                </h5>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label>{{ form.EDA_phasic_mean.label }}</label>
+                        {{ form.EDA_phasic_mean }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label>{{ form.EDA_phasic_min.label }}</label>
+                        {{ form.EDA_phasic_min }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label>{{ form.EDA_smna_min.label }}</label>
+                        {{ form.EDA_smna_min }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label>{{ form.EDA_tonic_mean.label }}</label>
+                        {{ form.EDA_tonic_mean }}
+                    </div>
+                </div>
+                
+                <h5 class="mb-3 mt-4">
+                    <span class="badge bg-info">3</span> Respiration
+                </h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>{{ form.Resp_mean.label }}</label>
+                        {{ form.Resp_mean }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>{{ form.Resp_std.label }}</label>
+                        {{ form.Resp_std }}
+                    </div>
+                </div>
+                
+                <h5 class="mb-3 mt-4">
+                    <span class="badge bg-warning">4</span> Temperature
+                </h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>{{ form.TEMP_mean.label }}</label>
+                        {{ form.TEMP_mean }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>{{ form.TEMP_std.label }}</label>
+                        {{ form.TEMP_std }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>{{ form.TEMP_slope.label }}</label>
+                        {{ form.TEMP_slope }}
+                    </div>
+                </div>
+                
+                <h5 class="mb-3 mt-4">
+                    <span class="badge bg-secondary">5</span> Demographics
+                </h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>{{ form.age.label }}</label>
+                        {{ form.age }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>{{ form.height.label }}</label>
+                        {{ form.height }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>{{ form.weight.label }}</label>
+                        {{ form.weight }}
+                    </div>
+                </div>
+                
+                <div class="mt-5 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg me-3">
+                        🔮 Predict Stress Level
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg">
+                        ← Back to Dashboard
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card mt-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+        <div class="card-body p-4">
+            <h5 class="mb-3">💡 Sample Data for Testing</h5>
+            <p class="text-muted mb-3">Use these sample values from the training dataset:</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="fw-bold">BVP & EDA</h6>
+                            <small>
+                                <strong>BVP:</strong> mean=0.025, std=0.015, peak_freq=1.2<br>
+                                <strong>EDA:</strong> phasic_mean=0.05, phasic_min=0.01, smna_min=0.02, tonic_mean=0.1
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="fw-bold">Respiration & Temperature</h6>
+                            <small>
+                                <strong>Resp:</strong> mean=0.3, std=0.05<br>
+                                <strong>TEMP:</strong> mean=32.5, std=0.2, slope=0.001<br>
+                                <strong>Demographics:</strong> age=27, height=175, weight=70
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

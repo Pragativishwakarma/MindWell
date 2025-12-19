@@ -1,0 +1,85 @@
+
+{% extends 'predictor/base.html' %}
+{% block content %}
+<div class="fade-in">
+    <div class="text-center mb-4">
+        <h2 class="mb-2">📊 Assessment Result</h2>
+        <p class="text-muted">Based on your questionnaire responses</p>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card" style="border: 3px solid 
+                {% if 'High' in response.predicted_level %}#dc3545
+                {% elif 'Medium' in response.predicted_level %}#ffc107
+                {% else %}#28a745{% endif %};">
+                <div class="card-body p-5 text-center">
+                    <h3 class="mb-4">Your Stress Level</h3>
+                    
+                    {% if 'High' in response.predicted_level %}
+                    <div class="alert alert-danger" style="font-size: 2.5rem; padding: 2.5rem; border-radius: 20px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">⚠️</div>
+                        <strong>{{ response.predicted_level }}</strong>
+                    </div>
+                    {% elif 'Medium' in response.predicted_level %}
+                    <div class="alert alert-warning" style="font-size: 2.5rem; padding: 2.5rem; border-radius: 20px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">😐</div>
+                        <strong>{{ response.predicted_level }}</strong>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success" style="font-size: 2.5rem; padding: 2.5rem; border-radius: 20px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">😊</div>
+                        <strong>{{ response.predicted_level }}</strong>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="text-muted mb-4">
+                        <div><strong>📅 Date:</strong> {{ response.created_at|date:"l, F d, Y" }}</div>
+                        <div><strong>🕐 Time:</strong> {{ response.created_at|date:"h:i:s A" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+                <div class="card-body p-4">
+                    <h5 class="mb-3">💡 Recommendations</h5>
+                    {% if 'High' in response.predicted_level %}
+                    <ul>
+                        <li>Consider speaking with a mental health professional</li>
+                        <li>Practice stress-reduction techniques daily</li>
+                        <li>Ensure adequate sleep and exercise</li>
+                        <li>Reach out to friends and family for support</li>
+                    </ul>
+                    {% elif 'Medium' in response.predicted_level %}
+                    <ul>
+                        <li>Monitor your stress levels regularly</li>
+                        <li>Incorporate relaxation techniques into your routine</li>
+                        <li>Maintain healthy lifestyle habits</li>
+                        <li>Take breaks when feeling overwhelmed</li>
+                    </ul>
+                    {% else %}
+                    <ul>
+                        <li>Great job managing your stress!</li>
+                        <li>Continue your current wellness practices</li>
+                        <li>Stay mindful of your mental health</li>
+                        <li>Share your strategies with others</li>
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <a class="btn btn-primary btn-lg me-2" href="{% url 'dashboard' %}">
+                    📊 View Dashboard
+                </a>
+                <a class="btn btn-success btn-lg me-2" href="{% url 'ml_predict' %}">
+                    🤖 Try ML Prediction
+                </a>
+                <a class="btn btn-outline-secondary btn-lg" href="{% url 'questionnaire' %}">
+                    🔄 Retake Assessment
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

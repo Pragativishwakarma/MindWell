@@ -1,0 +1,106 @@
+{% extends 'predictor/base.html' %}
+{% block content %}
+<div class="hero-section fade-in" data-aos="fade-up" data-aos-duration="1000">
+    <div class="row">
+        <div class="col-md-10 mx-auto text-center">
+            <h1 class="mb-4" data-aos="zoom-in" data-aos-delay="200">
+                <i class="fas fa-brain"></i> AI-Powered Mental Wellness
+            </h1>
+            <p class="lead" data-aos="fade-in" data-aos-delay="400">Your personal companion for stress detection, mood tracking, and mental health management</p>
+            <p class="mb-5" data-aos="fade-in" data-aos-delay="600">
+                {% if user.is_authenticated %}
+                    <a class="btn btn-primary btn-lg me-3" href="{% url 'dashboard' %}" data-bs-toggle="tooltip" data-bs-placement="top" title="View your personalized dashboard">
+                        <i class="fas fa-chart-line"></i> Go to Dashboard
+                    </a>
+                    <a class="btn btn-success btn-lg" href="{% url 'ml_predict' %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Get AI-driven stress predictions">
+                        <i class="fas fa-robot"></i> ML Prediction
+                    </a>
+                {% else %}
+                    <a class="btn btn-primary btn-lg me-3" href="{% url 'signup' %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Sign up for free and start your journey">
+                        <i class="fas fa-rocket"></i> Get Started Free
+                    </a>
+                    <a class="btn btn-outline-primary btn-lg" href="{% url 'login' %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Log in to your account">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5 fade-in" data-aos="fade-up" data-aos-duration="1000">
+    <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="200">
+        <div class="feature-card" data-bs-toggle="tooltip" data-bs-placement="top" title="Learn more about our ML stress detection">
+            <div class="feature-icon">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h4>ML Stress Detection</h4>
+            <p>Advanced machine learning model analyzes physiological data to predict stress levels with 95% accuracy</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="400">
+        <div class="feature-card" data-bs-toggle="tooltip" data-bs-placement="top" title="Track and visualize your mood patterns">
+            <div class="feature-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h4>Mood Tracking</h4>
+            <p>Track your daily mood patterns and visualize your mental health journey over time</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="600">
+        <div class="feature-card" data-bs-toggle="tooltip" data-bs-placement="top" title="Write and reflect in your personal journal">
+            <div class="feature-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <h4>Personal Journal</h4>
+            <p>Express your thoughts privately or share anonymously with the community</p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4 fade-in" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+    <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="200">
+        <div class="feature-card" data-bs-toggle="tooltip" data-bs-placement="top" title="Manage your tasks to reduce stress">
+            <div class="feature-icon">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <h4>Task Management</h4>
+            <p>Organize your daily tasks and reduce stress through better time management</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="400">
+        <div class="feature-card" data-bs-toggle="tooltip" data-bs-placement="top" title="Explore your data with interactive charts">
+            <div class="feature-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <h4>Analytics Dashboard</h4>
+            <p>Visualize your stress patterns and track improvements with interactive charts</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="600">
+        <div class="feature-card" data-bs-toggle="tooltip" data-bs-placement="top" title="Access helpful wellness resources">
+            <div class="feature-icon">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <h4>Wellness Resources</h4>
+            <p>Access curated resources, breathing exercises, and professional support</p>
+        </div>
+    </div>
+</div>
+
+{% if not user.is_authenticated %}
+<div class="row mt-5" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
+    <div class="col-md-8 mx-auto text-center">
+        <div class="card" style="background: linear-gradient(135deg,rgb(104, 143, 182) 0%,rgb(230, 173, 225) 100%); color: white;" data-aos="zoom-in" data-aos-delay="200">
+            <div class="card-body p-5">
+                <h3 class="mb-3">Ready to Take Control of Your Mental Health?</h3>
+                <p class="lead mb-4">Join thousands of users who are managing stress better with AI-powered insights</p>
+                <a class="btn btn-light btn-lg" href="{% url 'signup' %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Start your free account today">
+                    <i class="fas fa-user-plus"></i> Create Free Account
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
